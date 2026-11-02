@@ -42,10 +42,10 @@ These are also private, stored in `PHOTO_DATA` and `ARTWORK_DATA` in Apps Script
 Send each guest the link in `private/invite-link.txt` with their name in place of `NAME`. Use `%20` for spaces:
 
 ```text
-https://miinamoeini.github.io/birthday-invitation/?guest=Jamie%20Lee&code=YOUR_CODE
+https://miinamoeini.github.io/mina30/?g=Jamie%20Lee&c=YOUR_CODE
 ```
 
-Couples can share one link with both names (`?guest=Sarah%20%26%20Tom&code=YOUR_CODE`), which fills in both fields. In the sheet, a reply with a partner shows both names in Guest Name and `yes` under Plus One.
+Couples can share one link with both names (`?g=Sarah%20%26%20Tom&c=YOUR_CODE`), which fills in both fields. In the sheet, a reply with a partner shows both names in Guest Name and `yes` under Plus One.
 
 Without a valid code, a visitor sees only the envelope and a code prompt.
 
@@ -90,7 +90,7 @@ If you change `app.js` or `styles.css`, bump the `?v=` number on their tags in `
 
 | Problem | Fix |
 |---|---|
-| Guest is asked for a code | The link is missing `code=`, or the code changed. Resend the full link. |
+| Guest is asked for a code | The link is missing `c=`, or the code changed. Resend the full link. |
 | "We couldn't open your invitation" | Check the connection and retry. If it persists, check the `/exec` URL and that access is `Anyone`. |
 | Details didn't update | Deploy a new version in Apps Script; saving isn't enough. |
 | RSVP isn't in the sheet | Check Apps Script **Executions** and that the `RSVPs` tab exists. |

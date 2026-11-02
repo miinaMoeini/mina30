@@ -38,7 +38,7 @@
     const eventDate = new Date(config.dateTime);
     if (!Number.isFinite(eventDate.getTime()) || !/(Z|[+-]\d{2}:\d{2})$/.test(String(config.dateTime))) { showFatal('This invitation could not load. (Host: dateTime needs a valid date with a UTC offset.)'); return false; }
     const params = new URLSearchParams(window.location.search);
-    const namedGuest = cleanString(params.get('guest'), 80);
+    const namedGuest = cleanString(params.get('g') ?? params.get('guest'), 80);
     const localeSettings = { timeZone: config.timeZone || 'UTC' };
     try {
       setText('eventDate', new Intl.DateTimeFormat('en-US', { ...localeSettings, weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).format(eventDate));
@@ -67,7 +67,7 @@
     setText('eventDress', config.dressCode);
     setText('personalMessage', config.personalMessage);
     setText('guestWelcome', namedGuest ? `${namedGuest}, save your spot.` : 'Save your spot.');
-    // A couple's link can carry both names, as in ?guest=Sarah%20%26%20Tom.
+    // A couple's link can carry both names, as in ?g=Sarah%20%26%20Tom.
     if (namedGuest) {
       const [first, ...rest] = namedGuest.split(/\s+&\s+/);
       $('guestName').value = first;
@@ -510,7 +510,8 @@
       if (applyDetails(publicConfig.previewDetails)) { setUnlockLoading(false); armAutoMusic(); }
       return;
     }
-    const linkCode = cleanString(new URLSearchParams(location.search).get('code'), 40).toLowerCase();
+    const linkParams = new URLSearchParams(location.search);
+    const linkCode = cleanString(linkParams.get('c') ?? linkParams.get('code'), 40).toLowerCase();
     const code = linkCode || readStoredCode();
     if (code) loadDetails(code);
     else showCodeForm();
