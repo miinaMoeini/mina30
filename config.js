@@ -20,7 +20,6 @@ window.BIRTHDAY_CONFIG = Object.freeze({
     address: 'Sample City',
     mapsUrl: 'https://www.google.com/maps',
     dressCode: 'Sample dress code',
-    theme: 'Sample theme',
     subtitle: 'Thirty years in the making.',
     personalMessage: 'This is a preview with made-up details.',
     closingMessage: 'Until then.',

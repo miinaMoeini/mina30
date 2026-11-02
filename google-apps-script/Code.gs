@@ -26,7 +26,6 @@ const EVENT_DETAILS = {
   address: 'City, region, postal code',
   mapsUrl: 'https://www.google.com/maps/search/?api=1&query=YOUR%20ADDRESS',
   dressCode: 'Your dress code',
-  theme: 'Your theme',
   subtitle: 'Thirty years in the making.',
   personalMessage: 'Your welcome message.',
   closingMessage: 'Until then.',

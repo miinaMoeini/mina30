@@ -58,7 +58,6 @@
     setText('eventVenue', config.venue);
     setText('eventAddress', config.address);
     setText('eventDress', config.dressCode);
-    setText('eventTheme', config.theme);
     setText('personalMessage', config.personalMessage);
     setText('guestWelcome', namedGuest ? `${namedGuest}, your name is on the list.` : 'You are cordially invited.');
     if (namedGuest) $('guestName').value = namedGuest;
@@ -341,7 +340,7 @@
       text: config.eventTitle || `${config.name}'s Birthday`,
       dates: `${icsUtc(start)}/${icsUtc(end)}`,
       location: [config.venue, config.address].filter(Boolean).join(', '),
-      details: [config.personalMessage, `Dress code: ${config.dressCode}`, `Theme: ${config.theme}`].filter(Boolean).join('\n'),
+      details: [config.personalMessage, `Dress code: ${config.dressCode}`].filter(Boolean).join('\n'),
       ctz: config.timeZone || 'UTC'
     });
     return `https://calendar.google.com/calendar/render?${params}`;
@@ -359,7 +358,7 @@
       `DTSTART:${icsUtc(start)}`, `DTEND:${icsUtc(end)}`,
       `SUMMARY:${icsEscape(config.eventTitle || `${config.name}'s Birthday`)}`,
       `LOCATION:${icsEscape([config.venue, config.address].filter(Boolean).join(', '))}`,
-      `DESCRIPTION:${icsEscape([config.personalMessage, `Dress code: ${config.dressCode}`, `Theme: ${config.theme}`].filter(Boolean).join('\n'))}`,
+      `DESCRIPTION:${icsEscape([config.personalMessage, `Dress code: ${config.dressCode}`].filter(Boolean).join('\n'))}`,
       'END:VEVENT', 'END:VCALENDAR'
     ];
     const blob = new Blob([fields.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
