@@ -12,12 +12,12 @@ Party details and the guest list **do not live in this public repo**. They stay 
 4. **RSVP:** name, optional partner's name, attending or declining.
 5. **Finale:** closing message, a cake whose candles guests can blow out, and calendar buttons.
 
-Also included: soft synthesized piano chords that start on the guest's first tap (browsers block sound before that), with a mute button that remembers their choice, reduced-motion support, and no analytics or tracking.
+Also included: reduced-motion support, and no analytics or tracking.
 
 ```text
 index.html            All five screens (no party details)
 styles.css            Design; colours and fonts are tokens at the top
-app.js                Navigation, invite code, RSVP, music, calendar
+app.js                Navigation, invite code, RSVP, calendar
 config.js             PUBLIC settings: script URL, preview sample
 google-apps-script/   Code.gs template with placeholders only
 private/              Ignored by git: your real script copy and invite link
@@ -95,6 +95,5 @@ If you change `app.js` or `styles.css`, bump the `?v=` number on their tags in `
 | Details didn't update | Deploy a new version in Apps Script; saving isn't enough. |
 | RSVP isn't in the sheet | Check Apps Script **Executions** and that the `RSVPs` tab exists. |
 | Countdown is off by an hour | Check the UTC offset in `dateTime` for that date. |
-| Music is silent | Tap the music icon and check the phone's silent switch. |
-| iPhone doesn't add the event | Open the downloaded `.ics` file, or use the Google Calendar link. |
+| iPhone doesn't add the event | Open the invitation in Safari rather than inside an app, or use the Google Calendar link. |
 | Old link preview | Messaging apps cache previews and may take time to refresh. |

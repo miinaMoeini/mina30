@@ -36,6 +36,11 @@ const EVENT_DETAILS = {
 
 function doGet(e) {
   const p = (e && e.parameter) || {};
+  // A real calendar link for iPhones, which don't reliably open files created inside a page.
+  if (p.action === 'calendar') {
+    if (!isValidCode_(p.code)) return ContentService.createTextOutput('This invitation link is not valid.');
+    return ContentService.createTextOutput(buildCalendar_()).setMimeType(ContentService.MimeType.ICAL);
+  }
   const cb = String(p.callback || '');
   // JSONP callbacks must be valid, short JS identifiers to prevent code injection.
   if (!/^birthdayRSVP_[a-zA-Z0-9_]{8,70}$/.test(cb)) {
@@ -58,6 +63,38 @@ function doGet(e) {
 
 function isValidCode_(code) {
   return INVITE_CODE.indexOf('PASTE_') !== 0 && String(code || '').trim().toLowerCase() === INVITE_CODE;
+}
+
+function icsText_(value) {
+  return String(value || '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\;');
+}
+
+function icsTime_(date) {
+  return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+}
+
+// Calendar files must wrap lines at 75 bytes; a non-ASCII character is counted as 3 to stay safe.
+function icsFold_(line) {
+  let out = '', size = 0;
+  for (const ch of line) {
+    const bytes = ch.charCodeAt(0) > 127 ? 3 : 1;
+    if (size + bytes > 73) { out += '\r\n '; size = 1; }
+    out += ch; size += bytes;
+  }
+  return out;
+}
+
+function buildCalendar_() {
+  const d = EVENT_DETAILS;
+  const start = new Date(d.dateTime);
+  const end = new Date(start.getTime() + d.durationMinutes * 60000);
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Birthday Invitation//EN', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH',
+    'BEGIN:VEVENT', 'UID:' + EVENT_ID + '@birthday-invite', 'DTSTAMP:' + icsTime_(new Date()),
+    'DTSTART:' + icsTime_(start), 'DTEND:' + icsTime_(end),
+    'SUMMARY:' + icsText_(d.eventTitle),
+    'LOCATION:' + icsText_(d.venue + ', ' + d.address),
+    'DESCRIPTION:' + icsText_(d.personalMessage + '\nDress code: ' + d.dressCode),
+    'END:VEVENT', 'END:VCALENDAR'].map(icsFold_).join('\r\n') + '\r\n';
 }
 
 function recordRsvp_(p) {

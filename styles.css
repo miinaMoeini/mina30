@@ -38,10 +38,6 @@ h1:focus{outline:none} /* Focus moves to each screen's heading for screen reader
 .progress-muted,.progress-meta #progressTitle{color:var(--muted)}
 .progress-track{height:1px;background:var(--line)}
 .progress-fill{height:1px;background:var(--accent);box-shadow:0 0 8px rgba(220,206,179,.8);transition:width .7s cubic-bezier(.22,1,.36,1)}
-.music-button{width:44px;height:44px;margin-right:-12px;display:grid;place-items:center;background:none;border:0;color:var(--accent);transition:color .3s}
-.music-button:hover,.music-button[aria-pressed=true]{color:#e7dfd9}
-.music-button[aria-pressed=true] svg{animation:breathe 2.4s ease-in-out infinite}
-.music-button[aria-pressed=true] .music-slash{display:none}
 main{flex:1;display:flex;flex-direction:column}
 
 /* Screens */
@@ -145,6 +141,7 @@ main{flex:1;display:flex;flex-direction:column}
 .final-description{text-wrap:balance;color:var(--ink);font-weight:500;line-height:1.5;margin:0 0 4px}
 .final-note{color:var(--muted);margin:0 0 26px}
 .screen--final .button{margin-top:auto}
+.calendar-hint{margin:6px 0 0;color:var(--muted);font-size:14px;line-height:1.45;max-width:300px}
 
 /* Footer */
 .app-footer{display:flex;align-items:center;min-height:50px;padding-bottom:env(safe-area-inset-bottom)}

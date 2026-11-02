@@ -6,7 +6,6 @@
   // Party details stay out of this public site. They arrive from the private script once the invite code checks out.
   let config = publicConfig;
   const CODE_KEY = 'birthday-invite-code';
-  const MUTE_KEY = 'birthday-music-muted';
   const $ = (id) => document.getElementById(id);
   const screenIds = ['welcome', 'reveal', 'details', 'rsvp', 'final'];
   const stepTitles = ['Welcome', 'The Reveal', 'The Details', 'RSVP', 'Finale'];
@@ -107,9 +106,6 @@
         $('codeForm').hidden = true;
         $('unlockButton').hidden = false;
         setUnlockLoading(false);
-        // A typed code means the guest just tapped, so sound can start right away.
-        if (state.audioPrimed && !isMusicMuted()) startMusic();
-        else armAutoMusic();
         return;
       }
       storeCode('');
@@ -206,129 +202,6 @@
     }
     confettiFrame = requestAnimationFrame(draw);
   }
-
-  /* Soft piano-like chords, synthesized in the browser; no audio files, subscriptions, or autoplay. */
-  const music = { ctx: null, master: null, timer: null, note: 0, on: false };
-  const CHORD_MS = 6500;
-  const chords = [[130.81, 196, 246.94, 329.63], [110, 164.81, 246.94, 261.63],
-                  [87.31, 174.61, 220, 329.63], [98, 146.83, 220, 293.66]];
-  const highNotes = [659.25, 587.33, 523.25, 493.88];
-  function buildMusicGraph() {
-    const { ctx } = music;
-    music.master = ctx.createGain();
-    const tone = ctx.createBiquadFilter();
-    tone.type = 'lowpass'; tone.frequency.value = 1600;
-    const echo = ctx.createDelay(1);
-    echo.delayTime.value = .42;
-    const echoLevel = ctx.createGain();
-    echoLevel.gain.value = .28;
-    music.master.connect(tone);
-    tone.connect(ctx.destination);
-    tone.connect(echo);
-    echo.connect(echoLevel);
-    echoLevel.connect(echo);
-    echoLevel.connect(ctx.destination);
-  }
-  function playTone(frequency, when, level) {
-    const { ctx } = music;
-    const body = ctx.createOscillator();
-    const overtone = ctx.createOscillator();
-    const overtoneLevel = ctx.createGain();
-    const gain = ctx.createGain();
-    body.type = 'sine'; body.frequency.value = frequency;
-    overtone.type = 'triangle'; overtone.frequency.value = frequency * 2;
-    overtoneLevel.gain.value = .12;
-    gain.gain.setValueAtTime(.0001, when);
-    gain.gain.exponentialRampToValueAtTime(level, when + .04);
-    // Rings on long enough to overlap the next chord, so there are no silent gaps.
-    gain.gain.exponentialRampToValueAtTime(level * .14, when + 5.5);
-    gain.gain.exponentialRampToValueAtTime(.0001, when + 8);
-    body.connect(gain);
-    overtone.connect(overtoneLevel);
-    overtoneLevel.connect(gain);
-    gain.connect(music.master);
-    [body, overtone].forEach((osc) => { osc.start(when); osc.stop(when + 8.1); });
-  }
-  function playNote() {
-    if (!music.ctx || !music.on) return;
-    const step = music.note % chords.length;
-    const t = music.ctx.currentTime + .02;
-    // Rolling the chord slightly sounds like fingers on keys rather than one block of sound.
-    chords[step].forEach((frequency, i) => playTone(frequency, t + i * .09, .05));
-    if (music.note % 2 === 1) playTone(highNotes[step], t + 2.6, .022);
-    music.note++;
-    music.timer = setTimeout(playNote, CHORD_MS);
-  }
-  function updateMusicButton() {
-    const btn = $('musicToggle');
-    btn.setAttribute('aria-pressed', String(music.on));
-    btn.setAttribute('aria-label', music.on ? 'Mute background music' : 'Play background music');
-    btn.title = music.on ? 'Mute music' : 'Play background music';
-  }
-  function primeAudio() {
-    // Phones only allow sound that is set up during a tap, so this runs inside one.
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContextClass) throw new Error('Audio is not supported by this browser.');
-    if (!music.ctx) { music.ctx = new AudioContextClass(); buildMusicGraph(); }
-    return music.ctx.resume();
-  }
-  async function startMusic() {
-    if (music.on) return;
-    music.on = true;
-    updateMusicButton();
-    try {
-      await primeAudio();
-      if (!music.on) return;
-      // Fade in so the music never starts abruptly.
-      const now = music.ctx.currentTime;
-      music.master.gain.cancelScheduledValues(now);
-      music.master.gain.setValueAtTime(.0001, now);
-      music.master.gain.exponentialRampToValueAtTime(1, now + 3);
-      playNote();
-    } catch {
-      music.on = false;
-      updateMusicButton();
-      $('musicToggle').setAttribute('aria-label', 'Background music unavailable');
-      announce('Music is unavailable on this device.');
-    }
-  }
-  function stopMusic() {
-    music.on = false;
-    clearTimeout(music.timer); music.timer = null;
-    updateMusicButton();
-    if (!music.ctx) return;
-    const now = music.ctx.currentTime;
-    music.master.gain.cancelScheduledValues(now);
-    music.master.gain.setValueAtTime(Math.max(music.master.gain.value, .0001), now);
-    music.master.gain.exponentialRampToValueAtTime(.0001, now + .3);
-    setTimeout(() => { if (!music.on) music.ctx.suspend(); }, 340);
-  }
-  function isMusicMuted() { try { return localStorage.getItem(MUTE_KEY) === 'yes'; } catch { return false; } }
-  function rememberMute(muted) { try { if (muted) localStorage.setItem(MUTE_KEY, 'yes'); else localStorage.removeItem(MUTE_KEY); } catch { /* Not remembered in private browsing. */ } }
-  function toggleMusic() {
-    disarmAutoMusic();
-    if (music.on) { stopMusic(); rememberMute(true); announce('Background music muted.'); }
-    else { rememberMute(false); startMusic(); announce('Background music on.'); }
-  }
-  // Browsers block sound until a tap, so music starts on the guest's first tap after the invitation opens.
-  function autoMusicTrigger(event) {
-    if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
-    disarmAutoMusic();
-    if (!event.target.closest?.('#musicToggle')) startMusic();
-  }
-  function armAutoMusic() {
-    if (isMusicMuted()) return;
-    window.addEventListener('click', autoMusicTrigger, true);
-    window.addEventListener('keydown', autoMusicTrigger, true);
-  }
-  function disarmAutoMusic() {
-    window.removeEventListener('click', autoMusicTrigger, true);
-    window.removeEventListener('keydown', autoMusicTrigger, true);
-  }
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden && music.on) { clearTimeout(music.timer); music.timer = null; music.ctx?.suspend(); }
-    if (!document.hidden && music.on && music.ctx) { music.ctx.resume().then(() => { if (music.on) { clearTimeout(music.timer); playNote(); } }).catch(() => {}); }
-  });
 
   function updateComingText() {
     const both = cleanString($('guestName').value) && cleanString($('partnerName')?.value);
@@ -427,6 +300,7 @@
       : (coming ? (config.closingMessage || 'See you there!') : 'You will be missed.'));
     $('calendarButton').hidden = !coming;
     $('googleCalendarLink').hidden = !coming;
+    if ($('iosCalendarHint')) $('iosCalendarHint').hidden = !(coming && isIOS());
   }
   function googleCalendarUrl() {
     const start = new Date(config.dateTime);
@@ -444,7 +318,27 @@
 
   function icsEscape(text) { return String(text ?? '').replace(/\\/g, '\\\\').replace(/\n/g, '\\n').replace(/,/g, '\\,').replace(/;/g, '\\;'); }
   function icsUtc(date) { return date.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, ''); }
+  function isIOS() { return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); }
+  // Calendar files must wrap lines at 75 bytes.
+  function icsFold(line) {
+    const encoder = new TextEncoder();
+    let out = ''; let size = 0;
+    for (const ch of line) {
+      const bytes = encoder.encode(ch).length;
+      if (size + bytes > 73) { out += '\r\n '; size = 1; }
+      out += ch; size += bytes;
+    }
+    return out;
+  }
   function addToCalendar() {
+    // iPhones don't reliably open files created inside a page, so they get a real calendar link instead.
+    if (isIOS() && state.mode === 'live' && state.code) {
+      const url = new URL(config.rsvpEndpoint);
+      url.searchParams.set('action', 'calendar');
+      url.searchParams.set('code', state.code);
+      window.location.href = url.href;
+      return;
+    }
     const start = new Date(config.dateTime);
     if (!Number.isFinite(start.getTime())) { announce('Unable to create a calendar event: invalid date.'); return; }
     const end = new Date(start.getTime() + Math.max(1, Number(config.durationMinutes) || 240) * 60000);
@@ -457,7 +351,7 @@
       `DESCRIPTION:${icsEscape([config.personalMessage, `Dress code: ${config.dressCode}`].filter(Boolean).join('\n'))}`,
       'END:VEVENT', 'END:VCALENDAR'
     ];
-    const blob = new Blob([fields.join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
+    const blob = new Blob([fields.map(icsFold).join('\r\n') + '\r\n'], { type: 'text/calendar;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url; a.download = 'birthday-party.ics';
     document.body.appendChild(a); a.click(); a.remove();
@@ -486,7 +380,6 @@
     ['guestName', 'partnerName'].forEach((id) => $(id)?.addEventListener('input', updateComingText));
     $('rsvpForm').addEventListener('submit', handleRsvp);
     $('calendarButton').addEventListener('click', addToCalendar);
-    $('musicToggle').addEventListener('click', toggleMusic);
     $('cakeButton').addEventListener('click', () => {
       if ($('cakeButton').classList.contains('is-out')) return;
       $('cakeButton').classList.add('is-out');
@@ -496,10 +389,7 @@
     $('codeForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const code = cleanString($('inviteCode').value, 40).toLowerCase();
-      if (code) {
-        if (!isMusicMuted()) { try { primeAudio(); state.audioPrimed = true; } catch { /* No audio support; the invitation still works. */ } }
-        loadDetails(code).catch(() => {});
-      }
+      if (code) loadDetails(code).catch(() => {});
       else showCodeForm('Please enter your invitation code.');
     });
     // Must be absolute: an empty value means preview mode, using sample details from config.js.
@@ -507,7 +397,7 @@
     $('rsvpModeNote').hidden = state.mode === 'live';
     setText('rsvpModeNote', 'Preview mode: responses save only in this browser. Connect Google Sheets before sharing your invitation.');
     if (state.mode === 'demo') {
-      if (applyDetails(publicConfig.previewDetails)) { setUnlockLoading(false); armAutoMusic(); }
+      if (applyDetails(publicConfig.previewDetails)) setUnlockLoading(false);
       return;
     }
     const linkParams = new URLSearchParams(location.search);
