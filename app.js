@@ -207,29 +207,57 @@
     confettiFrame = requestAnimationFrame(draw);
   }
 
-  /* "Happy Birthday" (public domain) as a soft synthesized music box; no audio files, subscriptions, or autoplay. */
-  const music = { ctx: null, timer: null, note: 0, on: false };
-  const BEAT_MS = 520;
-  const melody = [[392, .75], [392, .25], [440, 1], [392, 1], [523.25, 1], [493.88, 2],
-                  [392, .75], [392, .25], [440, 1], [392, 1], [587.33, 1], [523.25, 2],
-                  [392, .75], [392, .25], [783.99, 1], [659.25, 1], [523.25, 1], [493.88, 1], [440, 1],
-                  [698.46, .75], [698.46, .25], [659.25, 1], [523.25, 1], [587.33, 1], [523.25, 3]];
+  /* Soft piano-like chords, synthesized in the browser; no audio files, subscriptions, or autoplay. */
+  const music = { ctx: null, master: null, timer: null, note: 0, on: false };
+  const CHORD_MS = 6500;
+  const chords = [[130.81, 196, 246.94, 329.63], [110, 164.81, 246.94, 261.63],
+                  [87.31, 174.61, 220, 329.63], [98, 146.83, 220, 293.66]];
+  const highNotes = [659.25, 587.33, 523.25, 493.88];
+  function buildMusicGraph() {
+    const { ctx } = music;
+    music.master = ctx.createGain();
+    const tone = ctx.createBiquadFilter();
+    tone.type = 'lowpass'; tone.frequency.value = 1600;
+    const echo = ctx.createDelay(1);
+    echo.delayTime.value = .42;
+    const echoLevel = ctx.createGain();
+    echoLevel.gain.value = .28;
+    music.master.connect(tone);
+    tone.connect(ctx.destination);
+    tone.connect(echo);
+    echo.connect(echoLevel);
+    echoLevel.connect(echo);
+    echoLevel.connect(ctx.destination);
+  }
+  function playTone(frequency, when, level) {
+    const { ctx } = music;
+    const body = ctx.createOscillator();
+    const overtone = ctx.createOscillator();
+    const overtoneLevel = ctx.createGain();
+    const gain = ctx.createGain();
+    body.type = 'sine'; body.frequency.value = frequency;
+    overtone.type = 'triangle'; overtone.frequency.value = frequency * 2;
+    overtoneLevel.gain.value = .12;
+    gain.gain.setValueAtTime(.0001, when);
+    gain.gain.exponentialRampToValueAtTime(level, when + .04);
+    // Rings on long enough to overlap the next chord, so there are no silent gaps.
+    gain.gain.exponentialRampToValueAtTime(level * .14, when + 5.5);
+    gain.gain.exponentialRampToValueAtTime(.0001, when + 8);
+    body.connect(gain);
+    overtone.connect(overtoneLevel);
+    overtoneLevel.connect(gain);
+    gain.connect(music.master);
+    [body, overtone].forEach((osc) => { osc.start(when); osc.stop(when + 8.1); });
+  }
   function playNote() {
     if (!music.ctx || !music.on) return;
-    const [frequency, beats] = melody[music.note % melody.length];
-    const t = music.ctx.currentTime;
-    const osc = music.ctx.createOscillator();
-    const gain = music.ctx.createGain();
-    osc.type = 'triangle'; osc.frequency.setValueAtTime(frequency, t);
-    gain.gain.setValueAtTime(.0001, t);
-    gain.gain.exponentialRampToValueAtTime(.07, t + .02);
-    gain.gain.exponentialRampToValueAtTime(.0001, t + 1.1);
-    osc.connect(gain); gain.connect(music.ctx.destination);
-    osc.start(t); osc.stop(t + 1.15);
+    const step = music.note % chords.length;
+    const t = music.ctx.currentTime + .02;
+    // Rolling the chord slightly sounds like fingers on keys rather than one block of sound.
+    chords[step].forEach((frequency, i) => playTone(frequency, t + i * .09, .05));
+    if (music.note % 2 === 1) playTone(highNotes[step], t + 2.6, .022);
     music.note++;
-    // Rest for a bar before the melody repeats.
-    const rest = music.note % melody.length === 0 ? 3 : 0;
-    music.timer = setTimeout(playNote, (beats + rest) * BEAT_MS);
+    music.timer = setTimeout(playNote, CHORD_MS);
   }
   function updateMusicButton() {
     const btn = $('musicToggle');
@@ -241,7 +269,7 @@
     // Phones only allow sound that is set up during a tap, so this runs inside one.
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (!AudioContextClass) throw new Error('Audio is not supported by this browser.');
-    if (!music.ctx) music.ctx = new AudioContextClass();
+    if (!music.ctx) { music.ctx = new AudioContextClass(); buildMusicGraph(); }
     return music.ctx.resume();
   }
   async function startMusic() {
@@ -250,7 +278,13 @@
     updateMusicButton();
     try {
       await primeAudio();
-      if (music.on) playNote();
+      if (!music.on) return;
+      // Fade in so the music never starts abruptly.
+      const now = music.ctx.currentTime;
+      music.master.gain.cancelScheduledValues(now);
+      music.master.gain.setValueAtTime(.0001, now);
+      music.master.gain.exponentialRampToValueAtTime(1, now + 3);
+      playNote();
     } catch {
       music.on = false;
       updateMusicButton();
@@ -261,8 +295,13 @@
   function stopMusic() {
     music.on = false;
     clearTimeout(music.timer); music.timer = null;
-    music.ctx?.suspend();
     updateMusicButton();
+    if (!music.ctx) return;
+    const now = music.ctx.currentTime;
+    music.master.gain.cancelScheduledValues(now);
+    music.master.gain.setValueAtTime(Math.max(music.master.gain.value, .0001), now);
+    music.master.gain.exponentialRampToValueAtTime(.0001, now + .3);
+    setTimeout(() => { if (!music.on) music.ctx.suspend(); }, 340);
   }
   function isMusicMuted() { try { return localStorage.getItem(MUTE_KEY) === 'yes'; } catch { return false; } }
   function rememberMute(muted) { try { if (muted) localStorage.setItem(MUTE_KEY, 'yes'); else localStorage.removeItem(MUTE_KEY); } catch { /* Not remembered in private browsing. */ } }
