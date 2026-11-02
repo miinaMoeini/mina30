@@ -166,7 +166,7 @@
     const w = window.innerWidth; const h = window.innerHeight;
     canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    const palette = ['#e2c27f', '#fff2c9', '#c79f55', '#f6e3ae', '#fffaf0'];
+    const palette = ['#dcceb3', '#e7dfd9', '#cbc3bf', '#958578', '#635d56'];
     const pieces = Array.from({ length: count }, () => ({
       x: Math.random() * w, y: -30 - Math.random() * h * 0.65,
       dx: (Math.random() - .5) * 2.5, dy: 1.4 + Math.random() * 3.7,
