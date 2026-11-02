@@ -15,7 +15,8 @@
   let confettiFrame = null;
 
   function announce(message) { $('srAnnounce').textContent = message; }
-  function setText(id, value) { $(id).textContent = String(value ?? ''); }
+  // Tolerates missing elements: a browser can briefly pair a cached older page with a newer script.
+  function setText(id, value) { const el = $(id); if (el) el.textContent = String(value ?? ''); }
   function cleanString(value, maxLength = 80) { return String(value ?? '').trim().replace(/\s+/g, ' ').slice(0, maxLength); }
   function safeUrl(value) {
     try { const u = new URL(value, window.location.href); return ['https:', 'http:'].includes(u.protocol) ? u.href : null; }
@@ -53,8 +54,10 @@
     $('photoFrame').hidden = !hasPhoto;
     $('revealArt').classList.toggle('has-photo', hasPhoto);
     const hasArtwork = /^data:image\//.test(String(config.artwork || ''));
-    if (hasArtwork) { $('artworkImg').src = config.artwork; $('artworkImg').alt = config.artworkAlt || ''; }
-    $('artworkFrame').hidden = !hasArtwork;
+    if ($('artworkFrame')) {
+      if (hasArtwork) { $('artworkImg').src = config.artwork; $('artworkImg').alt = config.artworkAlt || ''; }
+      $('artworkFrame').hidden = !hasArtwork;
+    }
     $('cakeAge').textContent = config.ageInWords || '';
     setText('eventTitle', config.eventTitle);
     setText('detailsIntro', config.subtitle || 'Here’s everything you need to know.');

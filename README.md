@@ -82,7 +82,7 @@ Then open <http://localhost:8000>. With the live script URL in `config.js`, this
 2. Go to **Settings → Pages → Deploy from a branch**, then choose `main` and `/ (root)`.
 3. Update the `og:url` and `og:image` tags in `index.html` to match your site, since messaging apps need full URLs for link previews.
 
-If you change `app.js` or `styles.css`, bump the `?v=` number on their tags in `index.html` so a cached page never runs with a mismatched script.
+If you change `app.js` or `styles.css`, bump the `?v=` number on their tags in `index.html` so browsers fetch the new files. GitHub Pages ignores that number when serving, so a cached older page can still briefly get the newest script for up to about 10 minutes. Keep `app.js` tolerant of elements that an older page doesn't have.
 
 ## Troubleshooting
 
