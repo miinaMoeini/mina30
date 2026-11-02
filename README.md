@@ -12,7 +12,7 @@ Party details and the guest list **do not live in this public repo**. They stay 
 4. **RSVP:** name, attending or declining, optional guest.
 5. **Finale:** closing message, a cake whose candles guests can blow out, and calendar buttons.
 
-Also included: an optional music-box "Happy Birthday" that never autoplays, reduced-motion support, and no analytics or tracking.
+Also included: a music-box "Happy Birthday" that starts on the guest's first tap (browsers block sound before that), with a mute button that remembers their choice, reduced-motion support, and no analytics or tracking.
 
 ```text
 index.html            All five screens (no party details)

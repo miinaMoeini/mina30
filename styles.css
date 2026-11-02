@@ -41,6 +41,7 @@ h1:focus{outline:none} /* Focus moves to each screen's heading for screen reader
 .music-button{width:44px;height:44px;margin-right:-12px;display:grid;place-items:center;background:none;border:0;color:var(--accent);transition:color .3s}
 .music-button:hover,.music-button[aria-pressed=true]{color:#e7dfd9}
 .music-button[aria-pressed=true] svg{animation:breathe 2.4s ease-in-out infinite}
+.music-button[aria-pressed=true] .music-slash{display:none}
 main{flex:1;display:flex;flex-direction:column}
 
 /* Screens */

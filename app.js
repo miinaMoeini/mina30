@@ -6,6 +6,7 @@
   // Party details stay out of this public site. They arrive from the private script once the invite code checks out.
   let config = publicConfig;
   const CODE_KEY = 'birthday-invite-code';
+  const MUTE_KEY = 'birthday-music-muted';
   const $ = (id) => document.getElementById(id);
   const screenIds = ['welcome', 'reveal', 'details', 'rsvp', 'final'];
   const stepTitles = ['Welcome', 'The Reveal', 'The Details', 'RSVP', 'Finale'];
@@ -101,6 +102,9 @@
         $('codeForm').hidden = true;
         $('unlockButton').hidden = false;
         setUnlockLoading(false);
+        // A typed code means the guest just tapped, so sound can start right away.
+        if (state.audioPrimed && !isMusicMuted()) startMusic();
+        else armAutoMusic();
         return;
       }
       storeCode('');
@@ -222,24 +226,60 @@
     const rest = music.note % melody.length === 0 ? 3 : 0;
     music.timer = setTimeout(playNote, (beats + rest) * BEAT_MS);
   }
-  async function toggleMusic() {
+  function updateMusicButton() {
     const btn = $('musicToggle');
+    btn.setAttribute('aria-pressed', String(music.on));
+    btn.setAttribute('aria-label', music.on ? 'Mute background music' : 'Play background music');
+    btn.title = music.on ? 'Mute music' : 'Play background music';
+  }
+  function primeAudio() {
+    // Phones only allow sound that is set up during a tap, so this runs inside one.
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) throw new Error('Audio is not supported by this browser.');
+    if (!music.ctx) music.ctx = new AudioContextClass();
+    return music.ctx.resume();
+  }
+  async function startMusic() {
+    if (music.on) return;
+    music.on = true;
+    updateMusicButton();
     try {
-      if (music.on) {
-        music.on = false; clearTimeout(music.timer); music.timer = null;
-        if (music.ctx) await music.ctx.suspend();
-      } else {
-        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-        if (!AudioContextClass) throw new Error('Audio is not supported by this browser.');
-        if (!music.ctx) music.ctx = new AudioContextClass();
-        await music.ctx.resume(); music.on = true;
-        playNote();
-      }
-      btn.setAttribute('aria-pressed', String(music.on));
-      btn.setAttribute('aria-label', music.on ? 'Mute background music' : 'Play background music');
-      btn.title = music.on ? 'Mute music' : 'Play background music';
-      announce(music.on ? 'Background music on.' : 'Background music muted.');
-    } catch { btn.setAttribute('aria-label', 'Background music unavailable'); announce('Music is unavailable on this device.'); }
+      await primeAudio();
+      if (music.on) playNote();
+    } catch {
+      music.on = false;
+      updateMusicButton();
+      $('musicToggle').setAttribute('aria-label', 'Background music unavailable');
+      announce('Music is unavailable on this device.');
+    }
+  }
+  function stopMusic() {
+    music.on = false;
+    clearTimeout(music.timer); music.timer = null;
+    music.ctx?.suspend();
+    updateMusicButton();
+  }
+  function isMusicMuted() { try { return localStorage.getItem(MUTE_KEY) === 'yes'; } catch { return false; } }
+  function rememberMute(muted) { try { if (muted) localStorage.setItem(MUTE_KEY, 'yes'); else localStorage.removeItem(MUTE_KEY); } catch { /* Not remembered in private browsing. */ } }
+  function toggleMusic() {
+    disarmAutoMusic();
+    if (music.on) { stopMusic(); rememberMute(true); announce('Background music muted.'); }
+    else { rememberMute(false); startMusic(); announce('Background music on.'); }
+  }
+  // Browsers block sound until a tap, so music starts on the guest's first tap after the invitation opens.
+  function autoMusicTrigger(event) {
+    if (event.type === 'keydown' && event.key !== 'Enter' && event.key !== ' ') return;
+    disarmAutoMusic();
+    if (!event.target.closest?.('#musicToggle')) startMusic();
+  }
+  function armAutoMusic() {
+    if (isMusicMuted()) return;
+    window.addEventListener('click', autoMusicTrigger, true);
+    window.addEventListener('keydown', autoMusicTrigger, true);
+  }
+  function disarmAutoMusic() {
+    window.removeEventListener('click', autoMusicTrigger, true);
+    window.removeEventListener('keydown', autoMusicTrigger, true);
   }
   document.addEventListener('visibilitychange', () => {
     if (document.hidden && music.on) { clearTimeout(music.timer); music.timer = null; music.ctx?.suspend(); }
@@ -408,7 +448,10 @@
     $('codeForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const code = cleanString($('inviteCode').value, 40).toLowerCase();
-      if (code) loadDetails(code).catch(() => {});
+      if (code) {
+        if (!isMusicMuted()) { try { primeAudio(); state.audioPrimed = true; } catch { /* No audio support; the invitation still works. */ } }
+        loadDetails(code).catch(() => {});
+      }
       else showCodeForm('Please enter your invitation code.');
     });
     // Must be absolute: an empty value means preview mode, using sample details from config.js.
@@ -416,7 +459,7 @@
     $('rsvpModeNote').hidden = state.mode === 'live';
     setText('rsvpModeNote', 'Preview mode: responses save only in this browser. Connect Google Sheets before sharing your invitation.');
     if (state.mode === 'demo') {
-      if (applyDetails(publicConfig.previewDetails)) setUnlockLoading(false);
+      if (applyDetails(publicConfig.previewDetails)) { setUnlockLoading(false); armAutoMusic(); }
       return;
     }
     const linkCode = cleanString(new URLSearchParams(location.search).get('code'), 40).toLowerCase();
