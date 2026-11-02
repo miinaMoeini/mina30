@@ -9,7 +9,7 @@ Party details and the guest list **do not live in this public repo**. They stay 
 1. **Welcome:** ivory envelope with a soft taupe lining and black bow. Opens on tap.
 2. **Reveal:** birthday announcement with confetti and a personalized greeting.
 3. **Details:** date, location, dress code, live countdown, and Google Maps link.
-4. **RSVP:** name, attending or declining, optional guest.
+4. **RSVP:** name, optional partner's name, attending or declining.
 5. **Finale:** closing message, a cake whose candles guests can blow out, and calendar buttons.
 
 Also included: a music-box "Happy Birthday" that starts on the guest's first tap (browsers block sound before that), with a mute button that remembers their choice, reduced-motion support, and no analytics or tracking.
@@ -18,7 +18,7 @@ Also included: a music-box "Happy Birthday" that starts on the guest's first tap
 index.html            All five screens (no party details)
 styles.css            Design; colours and fonts are tokens at the top
 app.js                Navigation, invite code, RSVP, music, calendar
-config.js             PUBLIC settings: script URL, plus-one option, preview sample
+config.js             PUBLIC settings: script URL, preview sample
 google-apps-script/   Code.gs template with placeholders only
 private/              Ignored by git: your real script copy and invite link
 ```
@@ -44,6 +44,8 @@ Send each guest the link in `private/invite-link.txt` with their name in place o
 ```text
 https://miinamoeini.github.io/birthday-invitation/?guest=Jamie%20Lee&code=YOUR_CODE
 ```
+
+Couples can share one link with both names (`?guest=Sarah%20%26%20Tom&code=YOUR_CODE`), which fills in both fields. In the sheet, a reply with a partner shows both names in Guest Name and `yes` under Plus One.
 
 Without a valid code, a visitor sees only the envelope and a code prompt.
 

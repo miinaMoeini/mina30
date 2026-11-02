@@ -19,9 +19,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=19" />
+  <link rel="stylesheet" href="styles.css?v=20" />
   <script src="config.js" defer></script>
-  <script src="app.js?v=18" defer></script>
+  <script src="app.js?v=20" defer></script>
   <title>You're Invited ✨</title>
 </head>
 <body>
@@ -99,13 +99,14 @@
         <p class="eyebrow">Répondez s’il vous plaît</p>
         <h1 id="rsvpTitle" class="section-title section-title--small">Will you be joining the celebration <em>with your partner?</em></h1>
         <form id="rsvpForm" class="rsvp-form" novalidate>
-          <label class="field-label" for="guestName">Your Name(s)</label>
-          <input id="guestName" name="guestName" type="text" maxlength="80" autocomplete="name" required />
+          <label class="field-label" for="guestName">Your Name</label>
+          <input id="guestName" name="guestName" type="text" maxlength="38" autocomplete="name" required />
+          <label class="field-label field-label--spaced" for="partnerName">Partner’s Name (Optional)</label>
+          <input id="partnerName" name="partnerName" type="text" maxlength="38" autocomplete="off" />
           <fieldset class="rsvp-choices"><legend class="sr-only">Your reply</legend>
-            <label class="choice-card"><input type="radio" name="attendance" value="yes" required /><span class="choice-text">Absolutely, I’m Coming! 🥂</span></label>
+            <label class="choice-card"><input type="radio" name="attendance" value="yes" required /><span id="comingText" class="choice-text">Absolutely, I’m Coming! 🥂</span></label>
             <label class="choice-card"><input type="radio" name="attendance" value="no" required /><span class="choice-text">Sorry, Can’t Make It 💔</span></label>
           </fieldset>
-          <label id="plusOneControl" class="plus-one" for="plusOne"><input id="plusOne" type="checkbox" /><span class="check-box" aria-hidden="true"></span><span>I’m bringing a guest</span></label>
           <!-- Honeypot: hidden from humans; bots tend to fill it. -->
           <div class="honeypot" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" type="text" tabindex="-1" autocomplete="off" /></div>
           <p id="rsvpModeNote" class="mode-note"></p>

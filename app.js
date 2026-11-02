@@ -67,9 +67,14 @@
     setText('eventDress', config.dressCode);
     setText('personalMessage', config.personalMessage);
     setText('guestWelcome', namedGuest ? `${namedGuest}, save your spot.` : 'Save your spot.');
-    if (namedGuest) $('guestName').value = namedGuest;
+    // A couple's link can carry both names, as in ?guest=Sarah%20%26%20Tom.
+    if (namedGuest) {
+      const [first, ...rest] = namedGuest.split(/\s+&\s+/);
+      $('guestName').value = first;
+      if ($('partnerName')) $('partnerName').value = rest.join(' & ');
+    }
+    updateComingText();
     $('mapsButton').href = safeUrl(config.mapsUrl) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address || config.venue || '')}`;
-    $('plusOneControl').hidden = !config.allowPlusOne;
     document.title = `You're Invited · ${cleanString(config.name)}'s Birthday`;
     $('googleCalendarLink').href = googleCalendarUrl();
     startCountdown(eventDate);
@@ -286,6 +291,10 @@
     if (!document.hidden && music.on && music.ctx) { music.ctx.resume().then(() => { if (music.on) { clearTimeout(music.timer); playNote(); } }).catch(() => {}); }
   });
 
+  function updateComingText() {
+    const both = cleanString($('guestName').value) && cleanString($('partnerName')?.value);
+    setText('comingText', both ? 'Absolutely, We’re Coming! 🥂' : 'Absolutely, I’m Coming! 🥂');
+  }
   function showFormError(message) { setText('formError', message); $('formError').hidden = false; announce(message); }
   function setSubmitting(submitting) {
     state.busy = submitting;
@@ -334,15 +343,17 @@
     event.preventDefault();
     if (state.busy) return;
     $('formError').hidden = true;
-    const guestName = cleanString($('guestName').value, 80);
+    const yourName = cleanString($('guestName').value, 38);
+    const partnerName = cleanString($('partnerName')?.value, 38);
+    const guestName = partnerName ? `${yourName} & ${partnerName}` : yourName;
     const choice = document.querySelector('input[name="attendance"]:checked');
-    if (!guestName) { showFormError('Please enter your name.'); $('guestName').focus(); return; }
+    if (!yourName) { showFormError('Please enter your name.'); $('guestName').focus(); return; }
     if (!choice) { showFormError('Please select whether you can attend.'); return; }
     if ($('website').value) { showFormError('We could not verify this submission.'); return; }
     const reply = {
       code: state.code,
       guestName, attendance: choice.value,
-      plusOne: choice.value === 'yes' && config.allowPlusOne && $('plusOne').checked ? 'yes' : 'no'
+      plusOne: choice.value === 'yes' && partnerName ? 'yes' : 'no'
     };
     // Retrying the same answers reuses the ID, so a timed-out request that did save isn't recorded twice.
     const answers = JSON.stringify(reply);
@@ -431,11 +442,9 @@
     $('rsvpGoButton').addEventListener('click', () => showScreen(3));
     $('backButton').addEventListener('click', () => showScreen(state.step - 1));
     document.querySelectorAll('input[name="attendance"]').forEach((input) => input.addEventListener('change', () => {
-      $('plusOneControl').hidden = !config.allowPlusOne || input.value !== 'yes';
-      if (input.value !== 'yes') $('plusOne').checked = false;
       $('formError').hidden = true;
     }));
-    $('plusOneControl').hidden = true;
+    ['guestName', 'partnerName'].forEach((id) => $(id)?.addEventListener('input', updateComingText));
     $('rsvpForm').addEventListener('submit', handleRsvp);
     $('calendarButton').addEventListener('click', addToCalendar);
     $('musicToggle').addEventListener('click', toggleMusic);

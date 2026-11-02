@@ -6,7 +6,6 @@
 window.BIRTHDAY_CONFIG = Object.freeze({
   // Your deployed Google Apps Script /exec URL. Leave empty for local preview mode.
   rsvpEndpoint: 'https://script.google.com/macros/s/AKfycbyjkYp5sKbZHFoT4IhA0uvKa_giQgufNz2oPQktf5oXIfREc1GmTSUh3qi66t_u6RLvag/exec',
-  allowPlusOne: false,
   // Made-up details, shown only in preview mode. Never put real details here.
   previewDetails: {
     name: 'Alex',

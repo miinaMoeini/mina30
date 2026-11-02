@@ -116,6 +116,7 @@ main{flex:1;display:flex;flex-direction:column}
 .rsvp-form,.code-form{width:100%;display:flex;flex-direction:column;align-items:center;text-align:left}
 .code-form .button{margin-top:20px}
 .field-label{align-self:flex-start;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+.field-label--spaced{margin-top:20px}
 .rsvp-form>input[type=text],.code-form input{width:100%;height:46px;padding:0;border:0;border-bottom:1px solid var(--accent);border-radius:0;background:transparent;color:var(--ink);font-family:var(--sans);font-size:19px;outline:none;transition:box-shadow .2s}
 .rsvp-form>input[type=text]:focus,.code-form input:focus{box-shadow:0 1px 0 var(--ink)}
 .rsvp-choices{width:100%;margin:28px 0 0;border:0;padding:0;min-width:0;display:grid;gap:10px}
@@ -124,12 +125,6 @@ main{flex:1;display:flex;flex-direction:column}
 .choice-card:has(input:focus-visible){outline:1px solid var(--ink);outline-offset:3px}
 .choice-card input{position:absolute;opacity:0;width:1px;height:1px}
 .choice-text{font-size:17px;font-weight:500}
-.plus-one{align-self:stretch;position:relative;display:flex;align-items:center;justify-content:center;gap:12px;min-height:48px;margin-top:10px;cursor:pointer;font-size:17px}
-.plus-one input{position:absolute;opacity:0;width:1px;height:1px}
-.check-box{width:18px;height:18px;border:1px solid var(--accent);display:grid;place-items:center;transition:background .2s}
-.plus-one input:checked + .check-box{background:var(--accent)}
-.plus-one input:checked + .check-box::after{content:'';width:5px;height:9px;margin-top:-2px;border:solid var(--paper);border-width:0 1.5px 1.5px 0;transform:rotate(45deg)}
-.plus-one input:focus-visible + .check-box{outline:1px solid var(--ink);outline-offset:3px}
 .honeypot{position:absolute!important;left:-10000px!important;width:1px!important;height:1px!important;overflow:hidden!important}
 .mode-note{color:var(--muted);font-size:15px;line-height:1.5;margin:14px 0 0;text-align:center}
 .form-error{align-self:stretch;color:var(--danger);border-left:2px solid var(--danger);padding:2px 0 2px 12px;line-height:1.45;font-size:16px;margin:14px 0 0}
