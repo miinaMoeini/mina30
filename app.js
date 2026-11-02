@@ -66,7 +66,7 @@
     setText('eventAddress', config.address);
     setText('eventDress', config.dressCode);
     setText('personalMessage', config.personalMessage);
-    setText('guestWelcome', namedGuest ? `${namedGuest}, your name is on the list.` : 'You are cordially invited.');
+    setText('guestWelcome', namedGuest ? `${namedGuest}, save your spot.` : 'Save your spot.');
     if (namedGuest) $('guestName').value = namedGuest;
     $('mapsButton').href = safeUrl(config.mapsUrl) || `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(config.address || config.venue || '')}`;
     $('plusOneControl').hidden = !config.allowPlusOne;
