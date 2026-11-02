@@ -71,7 +71,7 @@
   function setUnlockLoading(loading) {
     $('unlockButton').disabled = loading;
     $('unlockSpinner').hidden = !loading;
-    setText('unlockText', loading ? 'One moment…' : 'Unlock Your Invitation');
+    setText('unlockText', loading ? 'One moment…' : 'Unlock Your Invitation 🎁');
   }
   function showCodeForm(message) {
     $('unlockButton').hidden = true;
@@ -128,7 +128,7 @@
     const title = $('screen-' + screenIds[index]).querySelector('h1');
     if (title) { title.tabIndex = -1; title.focus({ preventScroll: true }); }
     announce(`Step ${index + 1} of 5: ${stepTitles[index].toLowerCase()}`);
-    if (movingForward && (index === 1 || index === 4)) burstConfetti(index === 4 ? 80 : 60);
+    if (movingForward && (index === 1 || index === 4)) burstConfetti(index === 4 ? 170 : 140);
   }
 
   function startCountdown(date) {
@@ -162,11 +162,11 @@
     const w = window.innerWidth; const h = window.innerHeight;
     canvas.width = Math.round(w * scale); canvas.height = Math.round(h * scale);
     ctx.setTransform(scale, 0, 0, scale, 0, 0);
-    const palette = ['#141210', '#b9a27a', '#d9c9a8', '#fffdf8'];
+    const palette = ['#e2c27f', '#fff2c9', '#c79f55', '#f6e3ae', '#fffaf0'];
     const pieces = Array.from({ length: count }, () => ({
       x: Math.random() * w, y: -30 - Math.random() * h * 0.65,
       dx: (Math.random() - .5) * 2.5, dy: 1.4 + Math.random() * 3.7,
-      width: 1.5 + Math.random() * 2, height: 7 + Math.random() * 10,
+      width: 3 + Math.random() * 4, height: 6 + Math.random() * 9,
       angle: Math.random() * Math.PI * 2, turn: (Math.random() - .5) * .09,
       color: palette[Math.floor(Math.random() * palette.length)], opacity: .6 + Math.random() * .4
     }));
@@ -174,49 +174,57 @@
     function draw(now) {
       ctx.clearRect(0, 0, w, h);
       const elapsed = now - start;
-      const fade = Math.min(1, Math.max(0, (3900 - elapsed) / 800));
+      const fade = Math.min(1, Math.max(0, (5200 - elapsed) / 900));
       for (const p of pieces) {
         p.x += p.dx + Math.sin(elapsed / 400 + p.angle) * .3;
         p.y += p.dy; p.angle += p.turn;
         ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.angle);
+        ctx.scale(1, Math.cos(elapsed / 170 + p.angle * 3)); // Foil pieces flip as they fall.
         ctx.globalAlpha = p.opacity * fade; ctx.fillStyle = p.color;
         ctx.fillRect(-p.width / 2, -p.height / 2, p.width, p.height); ctx.restore();
       }
-      if (elapsed < 3900) confettiFrame = requestAnimationFrame(draw);
+      if (elapsed < 5200) confettiFrame = requestAnimationFrame(draw);
       else { ctx.clearRect(0, 0, w, h); confettiFrame = null; }
     }
     confettiFrame = requestAnimationFrame(draw);
   }
 
-  /* Original, synthesized ambience; no audio files, subscriptions, or autoplay. */
+  /* "Happy Birthday" (public domain) as a soft synthesized music box; no audio files, subscriptions, or autoplay. */
   const music = { ctx: null, timer: null, note: 0, on: false };
-  const notes = [261.63, 329.63, 392, 523.25, 440, 392, 329.63, 293.66,
-                 220, 261.63, 329.63, 440, 392, 329.63, 293.66, 261.63];
+  const BEAT_MS = 520;
+  const melody = [[392, .75], [392, .25], [440, 1], [392, 1], [523.25, 1], [493.88, 2],
+                  [392, .75], [392, .25], [440, 1], [392, 1], [587.33, 1], [523.25, 2],
+                  [392, .75], [392, .25], [783.99, 1], [659.25, 1], [523.25, 1], [493.88, 1], [440, 1],
+                  [698.46, .75], [698.46, .25], [659.25, 1], [523.25, 1], [587.33, 1], [523.25, 3]];
   function playNote() {
     if (!music.ctx || !music.on) return;
+    const [frequency, beats] = melody[music.note % melody.length];
     const t = music.ctx.currentTime;
     const osc = music.ctx.createOscillator();
     const gain = music.ctx.createGain();
-    osc.type = 'sine'; osc.frequency.setValueAtTime(notes[music.note % notes.length], t);
+    osc.type = 'triangle'; osc.frequency.setValueAtTime(frequency, t);
     gain.gain.setValueAtTime(.0001, t);
-    gain.gain.exponentialRampToValueAtTime(.036, t + .045);
-    gain.gain.exponentialRampToValueAtTime(.0001, t + .75);
+    gain.gain.exponentialRampToValueAtTime(.07, t + .02);
+    gain.gain.exponentialRampToValueAtTime(.0001, t + 1.1);
     osc.connect(gain); gain.connect(music.ctx.destination);
-    osc.start(t); osc.stop(t + .78);
+    osc.start(t); osc.stop(t + 1.15);
     music.note++;
+    // Rest for a bar before the melody repeats.
+    const rest = music.note % melody.length === 0 ? 3 : 0;
+    music.timer = setTimeout(playNote, (beats + rest) * BEAT_MS);
   }
   async function toggleMusic() {
     const btn = $('musicToggle');
     try {
       if (music.on) {
-        music.on = false; clearInterval(music.timer); music.timer = null;
+        music.on = false; clearTimeout(music.timer); music.timer = null;
         if (music.ctx) await music.ctx.suspend();
       } else {
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (!AudioContextClass) throw new Error('Audio is not supported by this browser.');
         if (!music.ctx) music.ctx = new AudioContextClass();
         await music.ctx.resume(); music.on = true;
-        playNote(); music.timer = setInterval(playNote, 340);
+        playNote();
       }
       btn.setAttribute('aria-pressed', String(music.on));
       btn.setAttribute('aria-label', music.on ? 'Mute background music' : 'Play background music');
@@ -225,8 +233,8 @@
     } catch { btn.setAttribute('aria-label', 'Background music unavailable'); announce('Music is unavailable on this device.'); }
   }
   document.addEventListener('visibilitychange', () => {
-    if (document.hidden && music.on) { clearInterval(music.timer); music.timer = null; music.ctx?.suspend(); }
-    if (!document.hidden && music.on && music.ctx) { music.ctx.resume().then(() => { if (music.on) { clearInterval(music.timer); playNote(); music.timer = setInterval(playNote, 340); } }).catch(() => {}); }
+    if (document.hidden && music.on) { clearTimeout(music.timer); music.timer = null; music.ctx?.suspend(); }
+    if (!document.hidden && music.on && music.ctx) { music.ctx.resume().then(() => { if (music.on) { clearTimeout(music.timer); playNote(); } }).catch(() => {}); }
   });
 
   function showFormError(message) { setText('formError', message); $('formError').hidden = false; announce(message); }
@@ -382,6 +390,12 @@
     $('rsvpForm').addEventListener('submit', handleRsvp);
     $('calendarButton').addEventListener('click', addToCalendar);
     $('musicToggle').addEventListener('click', toggleMusic);
+    $('cakeButton').addEventListener('click', () => {
+      if ($('cakeButton').classList.contains('is-out')) return;
+      $('cakeButton').classList.add('is-out');
+      setText('cakeHint', `Wish made for ${cleanString(config.name)} ✨`);
+      burstConfetti(170);
+    });
     $('codeForm').addEventListener('submit', (event) => {
       event.preventDefault();
       const code = cleanString($('inviteCode').value, 40).toLowerCase();

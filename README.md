@@ -6,13 +6,13 @@ Party details and the guest list **do not live in this public repo**. They stay 
 
 ## How it works
 
-1. **Welcome:** black envelope with a ribbon bow. Opens on tap.
+1. **Welcome:** ivory envelope with a gold lining and black bow. Opens on tap.
 2. **Reveal:** birthday announcement with confetti and a personalized greeting.
 3. **Details:** date, location, dress code, theme, live countdown, and Google Maps link.
 4. **RSVP:** name, attending or declining, optional guest.
-5. **Finale:** closing message, cake with candles, and calendar buttons.
+5. **Finale:** closing message, a cake whose candles guests can blow out, and calendar buttons.
 
-Also included: optional synthesized music that never autoplays, reduced-motion support, and no analytics or tracking.
+Also included: an optional music-box "Happy Birthday" that never autoplays, reduced-motion support, and no analytics or tracking.
 
 ```text
 index.html            All five screens (no party details)

@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#f6f1e7" />
-  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#0b0a09" />
+  <meta name="color-scheme" content="dark" />
   <meta name="referrer" content="no-referrer" />
   <meta name="description" content="Something special is waiting for you. Tap to unlock your invitation." />
   <meta property="og:type" content="website" />
@@ -19,15 +19,24 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Playfair+Display:ital,wght@0,500;1,500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
   <script src="config.js" defer></script>
-  <script src="app.js?v=4" defer></script>
+  <script src="app.js?v=6" defer></script>
   <title>You're Invited ✨</title>
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
     <symbol id="bow" viewBox="0 0 64 64"><g fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M32 22C24 9 8 7 7 15s16 11 25 7M32 22C40 9 56 7 57 15S41 26 32 22M31 24C27 37 20 49 12 61M33 24C37 37 44 49 52 61"/></g><rect x="29" y="19.5" width="6" height="6" rx="2" fill="currentColor"/></symbol>
+    <linearGradient id="foilGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff2c9"/><stop offset=".45" stop-color="#d8b36a"/><stop offset="1" stop-color="#8f6a2c"/></linearGradient>
+    <radialGradient id="foilBlack" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#6d655a"/><stop offset=".3" stop-color="#26221d"/><stop offset="1" stop-color="#050504"/></radialGradient>
+    <symbol id="balloonGold" viewBox="0 0 80 230"><path d="M40 84c-3 30 9 50 3 80s-8 44-3 64" fill="none" stroke="#e2c27f" stroke-width="1"/><ellipse cx="40" cy="42" rx="37" ry="41" fill="url(#foilGold)"/><ellipse cx="27" cy="25" rx="7" ry="12" fill="#fff" opacity=".4" transform="rotate(24 27 25)"/><path d="M40 83l-5 6h10z" fill="#8f6a2c"/></symbol>
+    <symbol id="balloonBlack" viewBox="0 0 80 230"><path d="M40 84c-3 30 9 50 3 80s-8 44-3 64" fill="none" stroke="#e2c27f" stroke-width="1"/><ellipse cx="40" cy="42" rx="37" ry="41" fill="url(#foilBlack)" stroke="#e2c27f" stroke-opacity=".35"/><ellipse cx="27" cy="25" rx="6" ry="11" fill="#fff" opacity=".28" transform="rotate(24 27 25)"/><path d="M40 83l-5 6h10z" fill="#26221d"/></symbol>
   </defs></svg>
+  <div class="sparkles" aria-hidden="true"><i style="left:6%;top:8%;--s:12px;animation-delay:-2.2s"></i><i style="left:92%;top:14%;--s:10px;animation-delay:-3.5s"></i><i style="left:14%;top:30%;--s:8px;animation-delay:-1.4s"></i><i style="left:88%;top:34%;--s:10px;animation-delay:-3.6s"></i><i style="left:5%;top:52%;--s:15px;animation-delay:-0.0s"></i><i style="left:95%;top:56%;--s:10px;animation-delay:-0.1s"></i><i style="left:10%;top:74%;--s:10px;animation-delay:-3.3s"></i><i style="left:90%;top:78%;--s:15px;animation-delay:-3.5s"></i><i style="left:50%;top:4%;--s:12px;animation-delay:-1.9s"></i><i style="left:30%;top:96%;--s:8px;animation-delay:-1.4s"></i><i style="left:70%;top:94%;--s:10px;animation-delay:-2.9s"></i><i style="left:3%;top:90%;--s:12px;animation-delay:-2.7s"></i><i style="left:97%;top:92%;--s:8px;animation-delay:-2.4s"></i><i style="left:22%;top:14%;--s:8px;animation-delay:-2.2s"></i><i style="left:78%;top:6%;--s:12px;animation-delay:-0.5s"></i></div>
+  <svg class="balloon balloon--one" viewBox="0 0 80 230" aria-hidden="true"><use href="#balloonGold"/></svg>
+  <svg class="balloon balloon--two" viewBox="0 0 80 230" aria-hidden="true"><use href="#balloonBlack"/></svg>
+  <svg class="balloon balloon--three" viewBox="0 0 80 230" aria-hidden="true"><use href="#balloonGold"/></svg>
+  <svg class="balloon balloon--four" viewBox="0 0 80 230" aria-hidden="true"><use href="#balloonBlack"/></svg>
   <canvas id="confettiCanvas" class="confetti-canvas" aria-hidden="true"></canvas>
 
   <div id="app" class="app-shell">
@@ -46,7 +55,7 @@
       <section id="screen-welcome" class="screen screen--welcome" aria-labelledby="welcomeTitle">
         <p class="eyebrow">A private invitation</p>
         <h1 id="welcomeTitle" class="hero-title">You’ve been invited to <em>something special…</em></h1>
-        <div id="envelopeScene" class="envelope-scene" role="img" aria-label="A black envelope tied with an ivory ribbon bow, with an invitation inside">
+        <div id="envelopeScene" class="envelope-scene" role="img" aria-label="An ivory envelope with a gold lining, tied with a black bow">
           <div class="envelope">
             <div class="envelope-back"></div>
             <div class="envelope-letter"><span>You’re invited</span></div>
@@ -66,8 +75,8 @@
 
       <!-- STEP 2 : REVEAL -->
       <section id="screen-reveal" class="screen screen--reveal" aria-labelledby="revealTitle" hidden>
-        <div class="reveal-art" aria-hidden="true"><svg class="bow art-bow" viewBox="0 0 64 64" aria-hidden="true"><use href="#bow"/></svg><span id="revealAge" class="age-numeral"></span></div>
-        <h1 id="revealTitle" class="reveal-headline">It’s My <em>Birthday!</em></h1>
+        <div class="reveal-art" aria-hidden="true"><svg class="bow art-bow" viewBox="0 0 64 64" aria-hidden="true"><use href="#bow"/></svg><span id="revealAge" class="age-numeral"></span><i class="glint" style="--s:20px;left:-6%;top:42%"></i><i class="glint" style="--s:14px;right:-5%;top:70%;animation-delay:-.8s"></i><i class="glint" style="--s:11px;left:12%;top:18%;animation-delay:-1.6s"></i></div>
+        <h1 id="revealTitle" class="reveal-headline">It’s My <em>Birthday!</em> <span aria-hidden="true">🎉</span></h1>
         <div class="name-lockup"><span id="revealName"></span></div>
         <p id="guestWelcome" class="reveal-description"></p>
         <p id="personalMessage" class="reveal-invitation"></p>
@@ -98,8 +107,8 @@
           <label class="field-label" for="guestName">Your Name</label>
           <input id="guestName" name="guestName" type="text" maxlength="80" autocomplete="name" required />
           <fieldset class="rsvp-choices"><legend class="sr-only">Your reply</legend>
-            <label class="choice-card"><input type="radio" name="attendance" value="yes" required /><span class="choice-text">Absolutely, I’m Coming!</span></label>
-            <label class="choice-card"><input type="radio" name="attendance" value="no" required /><span class="choice-text">Sorry, Can’t Make It</span></label>
+            <label class="choice-card"><input type="radio" name="attendance" value="yes" required /><span class="choice-text">Absolutely, I’m Coming! 🥂</span></label>
+            <label class="choice-card"><input type="radio" name="attendance" value="no" required /><span class="choice-text">Sorry, Can’t Make It 💔</span></label>
           </fieldset>
           <label id="plusOneControl" class="plus-one" for="plusOne"><input id="plusOne" type="checkbox" /><span class="check-box" aria-hidden="true"></span><span>I’m bringing a guest</span></label>
           <!-- Honeypot: hidden from humans; bots tend to fill it. -->
@@ -112,15 +121,21 @@
 
       <!-- STEP 5 : FINALE -->
       <section id="screen-final" class="screen screen--final" aria-labelledby="finalTitle" hidden>
-        <div class="final-art" role="img" aria-label="A line drawing of a birthday cake with three lit candles">
-          <svg class="cake-svg" viewBox="0 0 240 226" aria-hidden="true"><g fill="none" stroke="#141210" stroke-width="1">
-          <ellipse cx="120" cy="196" rx="108" ry="20"/>
-          <path d="M42 92v92c0 24 156 24 156 0V92" fill="#fffdf8"/>
-          <ellipse cx="120" cy="92" rx="78" ry="18" fill="#fffdf8"/>
-          <rect x="87.5" y="50" width="5" height="44" fill="#fffdf8"/><path class="cake-flame" d="M90 47c-5-6-1-12 0-15 1 4 5 9 0 15z" fill="#b9a27a" stroke="none"/><rect x="117.5" y="38" width="5" height="56" fill="#fffdf8"/><path class="cake-flame" d="M120 35c-5-6-1-12 0-15 1 4 5 9 0 15z" fill="#b9a27a" stroke="none"/><rect x="147.5" y="50" width="5" height="44" fill="#fffdf8"/><path class="cake-flame" d="M150 47c-5-6-1-12 0-15 1 4 5 9 0 15z" fill="#b9a27a" stroke="none"/>
-          <path d="M42.0 112.0Q45.0 127.4 47.9 118.9Q56.4 133.8 64.8 124.7Q77.5 138.7 90.2 128.6Q105.1 141.3 120.0 130.0Q134.9 141.3 149.8 128.6Q162.5 138.7 175.2 124.7Q183.6 133.8 192.1 118.9Q195.0 127.4 198.0 112.0"/></g>
-          <text id="cakeAge" x="120" y="172" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-style="italic" font-weight="500" font-size="30" fill="#141210"></text></svg>
-        </div>
+        <button id="cakeButton" class="cake-button" type="button" aria-label="Blow out the candles on the birthday cake">
+          <svg class="cake-svg" viewBox="0 0 260 244" aria-hidden="true"><defs>
+            <linearGradient id="cakeIvory" x1="0" x2="1"><stop offset="0" stop-color="#e3d6ba"/><stop offset=".35" stop-color="#fffaf0"/><stop offset="1" stop-color="#d8c9a8"/></linearGradient>
+            <linearGradient id="cakeGoldFill" x1="0" x2="1"><stop offset="0" stop-color="#a97f38"/><stop offset=".4" stop-color="#fff2c9"/><stop offset="1" stop-color="#b58c44"/></linearGradient>
+            <radialGradient id="cakeGlow"><stop offset="0" stop-color="#ffd978" stop-opacity=".75"/><stop offset="1" stop-color="#ffd978" stop-opacity="0"/></radialGradient></defs>
+          <ellipse cx="130" cy="218" rx="118" ry="17" fill="url(#cakeGoldFill)"/><ellipse cx="130" cy="214" rx="108" ry="13" fill="#17130d"/>
+          <path d="M38 134v74c0 18 184 18 184 0v-74z" fill="url(#cakeIvory)"/><ellipse cx="130" cy="134" rx="92" ry="16" fill="#fffaf0"/>
+          <path d="M38 131V136c0 14 23.0 14 23.0 0c0 26 23.0 26 23.0 0c0 10 23.0 10 23.0 0c0 30 23.0 30 23.0 0c0 14 23.0 14 23.0 0c0 24 23.0 24 23.0 0c0 10 23.0 10 23.0 0c0 28 23.0 28 23.0 0V131z" fill="url(#cakeGoldFill)"/>
+          <path d="M70 82v54c0 14 120 14 120 0V82z" fill="url(#cakeIvory)"/><ellipse cx="130" cy="82" rx="60" ry="11" fill="#fffaf0"/>
+          <path d="M70 79V84c0 10 20.0 10 20.0 0c0 20 20.0 20 20.0 0c0 8 20.0 8 20.0 0c0 22 20.0 22 20.0 0c0 10 20.0 10 20.0 0c0 18 20.0 18 20.0 0V79z" fill="url(#cakeGoldFill)"/>
+          <circle class="cake-halo" cx="103" cy="34" r="17" fill="url(#cakeGlow)"/><rect x="100" y="44" width="6" height="38" rx="1.5" fill="url(#cakeGoldFill)"/><path class="cake-flame" d="M103 42c-6-7-1-14 0-17 2 5 6 10 0 17z" fill="#ffd978"/><circle class="cake-halo" cx="130" cy="22" r="17" fill="url(#cakeGlow)"/><rect x="127" y="32" width="6" height="50" rx="1.5" fill="url(#cakeGoldFill)"/><path class="cake-flame" d="M130 30c-6-7-1-14 0-17 2 5 6 10 0 17z" fill="#ffd978"/><circle class="cake-halo" cx="157" cy="34" r="17" fill="url(#cakeGlow)"/><rect x="154" y="44" width="6" height="38" rx="1.5" fill="url(#cakeGoldFill)"/><path class="cake-flame" d="M157 42c-6-7-1-14 0-17 2 5 6 10 0 17z" fill="#ffd978"/>
+          <text id="cakeAge" x="130" y="192" text-anchor="middle" font-family="'Playfair Display', Georgia, serif" font-style="italic" font-weight="500" font-size="30" fill="#141210"></text>
+          <use href="#bow" x="110" y="104" width="40" height="40" color="#141210"/></svg>
+        </button>
+        <p id="cakeHint" class="cake-hint" aria-live="polite">Tap the candles to make a wish</p>
         <p id="confirmationLabel" class="eyebrow">Reply received</p>
         <h1 id="finalTitle" class="final-title"></h1>
         <p id="finalPersonal" class="final-description"></p>
