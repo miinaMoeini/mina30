@@ -93,8 +93,8 @@ main{flex:1;display:flex;flex-direction:column}
 .section-title--small{font-style:normal;font-size:clamp(37px,10vw,50px);line-height:1.1;margin:18px 0 26px}
 .event-subtitle{margin:0;color:var(--ink)}
 .section-intro{margin:3px 0 0;color:var(--muted)}
-.artwork-card{width:min(286px,78vw);margin:24px auto 0;padding:10px;background:#e7dfd9;box-shadow:0 0 34px rgba(220,206,179,.22);transform:rotate(-1.2deg)}
-.artwork-card img{display:block;width:100%;height:auto;mix-blend-mode:multiply}
+.artwork-card{width:min(320px,88vw);margin:18px auto 0}
+.artwork-card img{display:block;width:100%;height:auto}
 .details-card{width:100%;margin-top:26px;border-top:1px solid var(--accent)}
 .detail-row{display:flex;flex-direction:column;align-items:center;gap:2px;padding:17px 0;border-bottom:1px solid var(--line)}
 .detail-row:last-child{border-bottom:1px solid var(--accent)}
