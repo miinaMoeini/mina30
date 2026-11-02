@@ -12,6 +12,7 @@ const EVENT_ID = 'my-birthday';
 
 // Optional: a 'data:image/jpeg;base64,...' string. Stays private, like the details below.
 const PHOTO_DATA = '';
+const ARTWORK_DATA = ''; // Optional illustration, stored the same way.
 
 // Only sent to links with the right invite code.
 const EVENT_DETAILS = {
@@ -30,6 +31,7 @@ const EVENT_DETAILS = {
   personalMessage: 'Your welcome message.',
   closingMessage: 'Until then.',
   photoAlt: 'Describe your photo here.',
+  artworkAlt: 'Describe your illustration here.',
 };
 
 function doGet(e) {
@@ -43,7 +45,7 @@ function doGet(e) {
   let result;
   try {
     if (!isValidCode_(p.code)) result = { ok: false, message: 'This invitation link is not valid.' };
-    else if (p.action === 'details') result = { ok: true, details: Object.assign({ photo: PHOTO_DATA }, EVENT_DETAILS) };
+    else if (p.action === 'details') result = { ok: true, details: Object.assign({ photo: PHOTO_DATA, artwork: ARTWORK_DATA }, EVENT_DETAILS) };
     else result = recordRsvp_(p);
   } catch (error) {
     console.error(error);

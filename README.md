@@ -33,9 +33,9 @@ Details are in `EVENT_DETAILS` in your Apps Script project, not in this repo:
 
 Keep `private/Code.deployed.gs` in step if you use it as your backup. `dateTime` needs the UTC offset for the party's location on that date.
 
-## Changing the photo
+## Changing the photo or illustration
 
-The photo is also private, stored in `PHOTO_DATA` in Apps Script rather than in this repo. Compress it to about 100 KB, convert it to a `data:image/jpeg;base64,...` string, paste it in, update `photoAlt`, and deploy a new version. Leave `PHOTO_DATA` empty to show no photo.
+These are also private, stored in `PHOTO_DATA` and `ARTWORK_DATA` in Apps Script rather than in this repo. Compress it to about 100 KB, convert it to a `data:image/jpeg;base64,...` string, paste it in, update `photoAlt` or `artworkAlt`, and deploy a new version. Leave either empty to hide it.
 
 ## Sending invitations
 

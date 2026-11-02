@@ -52,6 +52,9 @@
     if (hasPhoto) { $('childPhoto').src = config.photo; $('childPhoto').alt = config.photoAlt || ''; }
     $('photoFrame').hidden = !hasPhoto;
     $('revealArt').classList.toggle('has-photo', hasPhoto);
+    const hasArtwork = /^data:image\//.test(String(config.artwork || ''));
+    if (hasArtwork) { $('artworkImg').src = config.artwork; $('artworkImg').alt = config.artworkAlt || ''; }
+    $('artworkFrame').hidden = !hasArtwork;
     $('cakeAge').textContent = config.ageInWords || '';
     setText('eventTitle', config.eventTitle);
     setText('detailsIntro', config.subtitle || 'Here’s everything you need to know.');
