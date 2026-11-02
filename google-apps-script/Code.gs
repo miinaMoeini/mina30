@@ -10,6 +10,9 @@ const SHEET_NAME = 'RSVPs';
 const INVITE_CODE = 'PASTE_A_LONG_RANDOM_CODE_HERE'; // Lowercase. Goes in each guest's link.
 const EVENT_ID = 'my-birthday';
 
+// Optional: a 'data:image/jpeg;base64,...' string. Stays private, like the details below.
+const PHOTO_DATA = '';
+
 // Only sent to links with the right invite code.
 const EVENT_DETAILS = {
   name: 'Your Name',
@@ -27,6 +30,7 @@ const EVENT_DETAILS = {
   subtitle: 'Thirty years in the making.',
   personalMessage: 'Your welcome message.',
   closingMessage: 'Until then.',
+  photoAlt: 'Describe your photo here.',
 };
 
 function doGet(e) {
@@ -40,7 +44,7 @@ function doGet(e) {
   let result;
   try {
     if (!isValidCode_(p.code)) result = { ok: false, message: 'This invitation link is not valid.' };
-    else if (p.action === 'details') result = { ok: true, details: EVENT_DETAILS };
+    else if (p.action === 'details') result = { ok: true, details: Object.assign({ photo: PHOTO_DATA }, EVENT_DETAILS) };
     else result = recordRsvp_(p);
   } catch (error) {
     console.error(error);

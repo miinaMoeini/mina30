@@ -48,6 +48,10 @@
     setText('revealName', cleanString(config.name, 80).toUpperCase());
     setText('eventName', cleanString(config.name, 80));
     setText('revealAge', config.age ?? '');
+    const hasPhoto = /^data:image\//.test(String(config.photo || ''));
+    if (hasPhoto) { $('childPhoto').src = config.photo; $('childPhoto').alt = config.photoAlt || ''; }
+    $('photoFrame').hidden = !hasPhoto;
+    $('revealArt').classList.toggle('has-photo', hasPhoto);
     $('cakeAge').textContent = config.ageInWords || '';
     setText('eventTitle', config.eventTitle);
     setText('detailsIntro', config.subtitle || 'Here’s everything you need to know.');
